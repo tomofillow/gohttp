@@ -5,11 +5,24 @@ import (
 	"net/http"
 )
 
-func handler(writer http.ResponseWriter, request *http.Request) {
-	fmt.Fprintf(writer, "Hello World", request.URL.Path[1:])
+func setCookie(w http.ResponseWriter, r *http.Request) {
+	cookie := http.Cookie{
+		Name:     "cookie",
+		Value:    "cookie",
+		HttpOnly: true,
+	}
+	http.SetCookie(w, &cookie)
+	h := r.Header["Cookie"]
+	fmt.Fprintln(w, h)
 }
 
 func main() {
-	http.HandleFunc("/", handler)
-	http.ListenAndServe(":8080", nil)
+	server := http.Server{
+		Addr: "127.0.0.1:8080",
+		//	DefaultServeMux
+	}
+
+	http.HandleFunc("/set_cookie", setCookie)
+
+	server.ListenAndServe()
 }
